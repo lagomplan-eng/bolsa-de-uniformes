@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolsa de Uniformes — Colegio Ciudad de México</title>
+<style>
+  :root{
+    --navy:#1a2472;
+    --green:#2e7d5e;
+    --green-dark:#256249;
+    --green-light:#e7f3ee;
+    --green-soft:#f3f9f6;
+    --ink:#1f2b27;
+    --muted:#6b7d76;
+    --line:#dde7e2;
+    --card:#ffffff;
+    --shadow:0 4px 18px rgba(31,43,39,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:var(--green-soft);
+    line-height:1.5;
+  }
+
+  /* Top bar */
+  .topbar{
+    background:var(--navy);
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .topbar img{height:54px;width:auto;display:block;}
+
+  /* Hero */
+  .hero{
+    background:var(--green);
+    color:#fff;
+    padding:48px 20px 40px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-60px;top:-60px;
+    width:240px;height:240px;
+    background:rgba(255,255,255,.06);
+    border-radius:50%;
+  }
+  .hero h1{
+    margin:0 0 14px;
+    font-size:2.4rem;
+    font-weight:800;
+    letter-spacing:-.5px;
+    position:relative;
+  }
+  .hero p{
+    margin:0 auto;
+    max-width:680px;
+    font-size:1.06rem;
+    opacity:.95;
+    position:relative;
+  }
+  .leaf{font-size:1.6rem;display:block;margin-bottom:8px;position:relative;}
+
+  /* Impact pills */
+  .pills{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:12px;
+    margin:26px auto 0;
+    max-width:760px;
+    position:relative;
+  }
+  .pill{
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:999px;
+    padding:10px 18px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .pill b{font-size:1.15rem;font-weight:800;}
+  .pill span{font-size:.86rem;opacity:.92;}
+
+  /* Layout */
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 60px;}
+
+  /* Controls */
+  .controls{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:18px;
+    display:grid;
+    grid-template-columns:1.6fr 1fr 1fr;
+    gap:14px;
+    margin-bottom:8px;
+  }
+  .field label{
+    display:block;
+    font-size:.74rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .field input,.field select{
+    width:100%;
+    padding:11px 13px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:.95rem;
+    background:#fff;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s;
+  }
+  .field input:focus,.field select:focus{border-color:var(--green);}
+
+  .levels{display:flex;gap:8px;margin:16px 0 18px;flex-wrap:wrap;}
+  .levels button{
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    padding:9px 18px;
+    border-radius:999px;
+    font-size:.92rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .levels button:hover{border-color:var(--green);}
+  .levels button.active{
+    background:var(--green);
+    border-color:var(--green);
+    color:#fff;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    color:var(--muted);
+    font-size:.88rem;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .refresh-note{display:flex;align-items:center;gap:6px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;}
+
+  /* Grid: 2 cards per row */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    transition:transform .15s,box-shadow .15s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(31,43,39,.13);}
+  .card.empty{opacity:.62;}
+  .thumb{
+    background:#ffffff;
+    padding:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:200px;
+  }
+  .thumb img{max-height:100%;max-width:100%;object-fit:contain;}
+  .card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1;}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .card-body h3{margin:0;font-size:1.15rem;font-weight:700;}
+  .badge{
+    font-size:.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    padding:4px 9px;
+    border-radius:999px;
+    white-space:nowrap;
+    background:var(--green-light);
+    color:var(--green-dark);
+  }
+  .badge.pri{background:#e9eefb;color:#33459e;}
+  .badge.sec{background:#fdeee4;color:#b5611f;}
+
+  .sizes{display:flex;flex-wrap:wrap;gap:7px;}
+  .sz{
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:5px 9px;
+    font-size:.82rem;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  .sz b{font-weight:700;}
+  .sz .qty{
+    background:var(--green);
+    color:#fff;
+    border-radius:6px;
+    font-size:.68rem;
+    padding:1px 6px;
+    font-weight:700;
+  }
+  .no-stock{color:var(--muted);font-size:.88rem;font-style:italic;}
+
+  .card-foot{
+    margin-top:auto;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:.9rem;
+    color:var(--green-dark);
+    font-weight:600;
+  }
+
+  .status{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--muted);
+    font-size:1rem;
+  }
+  .spinner{
+    width:34px;height:34px;
+    border:3px solid var(--line);
+    border-top-color:var(--green);
+    border-radius:50%;
+    margin:0 auto 14px;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  footer{
+    text-align:center;
+    padding:26px 20px 40px;
+    color:var(--muted);
+    font-size:.82rem;
+  }
+
+  @media(max-width:760px){
+    .hero h1{font-size:1.8rem;}
+    .controls{grid-template-columns:1fr;}
+    .grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <img src="https://colegiocdmx.edu.mx/wp-content/uploads/2021/09/logo-colegio-ciudad-de-mexico-blanco.png" alt="Colegio Ciudad de México">
+  </div>
+
+  <header class="hero">
+    <span class="leaf">🌱</span>
+    <h1>Uniformes con segunda vida</h1>
+    <p>Dona los uniformes que tu familia ya no usa y dale una segunda oportunidad a la ropa escolar.
+       Cada prenda que vuelve a la bolsa ahorra recursos, reduce residuos y apoya a otra familia de
+       la comunidad del Colegio Ciudad de México.</p>
+    <div class="pills">
+      <div class="pill"><b id="pill-prendas">0</b><span>prendas disponibles</span></div>
+      <div class="pill"><b id="pill-tipos">0</b><span>tipos de uniforme</span></div>
+      <div class="pill"><b>♻️</b><span>moda circular escolar</span></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="controls">
+      <div class="field">
+        <label for="search">Buscar prenda</label>
+        <input id="search" type="text" placeholder="Ej. chamarra, suéter, jumper…" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="sizeSel">Talla</label>
+        <select id="sizeSel"><option value="">Todas las tallas</option></select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <div style="font-size:.82rem;color:var(--muted);padding-top:6px;">
+          Inventario en vivo desde la hoja de la comunidad.
+        </div>
+      </div>
+    </div>
+
+    <div class="levels" id="levels">
+      <button data-level="todos" class="active">Todos los niveles</button>
+      <button data-level="pri">Primaria</button>
+      <button data-level="sec">Secundaria / Prepa</button>
+    </div>
+
+    <div class="meta-row">
+      <span id="count">Cargando…</span>
+      <span class="refresh-note"><span class="dot"></span> Se actualiza cada 5 minutos · <span id="updated">—</span></span>
+    </div>
+
+    <div id="grid" class="grid"></div>
+
+    <div id="status" class="status">
+      <div class="spinner"></div>
+      Cargando inventario…
+    </div>
+  </main>
+
+  <footer>
+    Bolsa de Uniformes · Colegio Ciudad de México · Proyecto de sustentabilidad y comunidad
+  </footer>
+
+<script>
+const CSV_URL = "https://corsproxy.io/?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2Fe%2F2PACX-1vTECN_ZotXxL3qlrNVMHQ1JVXzfHyLVUVwevpOznWTBCRZsKnhpFvMXJCLS525I0RrnogefxvhpczAV%2Fpub%3Fgid%3D1306504336%26single%3Dtrue%26output%3Dcsv";
+const IMG_DIR = "imágenes/";
+const REFRESH_MS = 5 * 60 * 1000;
+
+// slug -> { name, img, level }
+const CATALOG = {
+  "CHALECO-TODOS":            { name:"Chaleco",              img:"Chaleco-todos.png",        level:"todos" },
+  "CHAMARRA/DEPORTIVA-TODOS": { name:"Chamarra deportiva",   img:"Chamarra-deportiva.png",   level:"todos" },
+  "CHAMARRA/INVIERNO-TODOS":  { name:"Chamarra de invierno", img:"Chamarra-invierno.png",    level:"todos" },
+  "HOODIE-SEC/PREP":          { name:"Hoodie",               img:"Hoodie.png",               level:"sec" },
+  "JUMPER-PRI":               { name:"Jumper",               img:"Jumper.png",               level:"pri" },
+  "PANTALON/DEPORTIVO-TODOS": { name:"Pantalón deportivo",   img:"Pantalon-deportivo.png",   level:"todos" },
+  "PANTALON/VESTIR-PRI":      { name:"Pantalón de vestir",   img:"Pantalon-vestir.png",      level:"pri" },
+  "PLAYERA-SEC/PREP":         { name:"Playera",              img:"Polo.png",                 level:"sec" },
+  "PLAYERAV-SEC/PREP":        { name:"Playera V",            img:"Playera-cuelloV.png",      level:"sec" },
+  "PLAYERA/POLO":             { name:"Playera polo",         img:"Polo.png",                 level:"todos" },
+  "POLO/LARGA-TODOS":         { name:"Polo manga larga",     img:"Polo-manga-larga.png",     level:"todos" },
+  "SHORT-TODOS":              { name:"Short",                img:"Shorts-todos.png",         level:"todos" },
+  "SUETER/ABIERTO-PRI":       { name:"Suéter abierto",       img:"Sueter-abierto.png",       level:"pri" },
+  "SUETER/CERRADO-PRI":       { name:"Suéter cerrado",       img:"Sueter-cerrado.png",       level:"pri" },
+  "SUETER/DEPORTIVO-SEC/PREP":{ name:"Suéter universitario", img:"Sueter-universitario.png", level:"sec" },
+  "BATA/LABORATORIO-SEC/PREP":{ name:"Bata de laboratorio",  img:"bata.jpg",                 level:"sec" }
+};
+
+const LEVEL_LABEL = { pri:"Primaria", sec:"Sec / Prepa", todos:"Todos" };
+const SIZE_ORDER = ["CH","M","G","XG"]; // letter sizes ordered after numeric ones
+
+let ITEMS = [];          // built catalogue items with stock
+let activeLevel = "todos";
+
+/* ---------- CSV parsing ---------- */
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQ = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQ){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field += '"'; i++; }
+        else inQ = false;
+      } else field += c;
+    } else {
+      if(c === '"') inQ = true;
+      else if(c === ','){ row.push(field); field = ""; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ""; }
+      else if(c === '\r'){ /* skip */ }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function buildItems(rows){
+  if(!rows.length) return [];
+  const header = rows[0].map(h => h.trim().toLowerCase());
+  const iTipo  = header.indexOf("tipo");
+  const iTalla = header.indexOf("talla");
+  const iStock = header.indexOf("stock");
+
+  const groups = {}; // slug -> { size -> qty }
+  for(let r=1;r<rows.length;r++){
+    const cols = rows[r];
+    if(!cols || cols.length < 3) continue;
+    const slug  = (cols[iTipo]  || "").trim();
+    const talla = (cols[iTalla] || "").trim();
+    const qty   = parseInt((cols[iStock] || "").trim(), 10);
+    if(!slug || !CATALOG[slug]) continue;
+    if(!groups[slug]) groups[slug] = {};
+    const q = isNaN(qty) ? 0 : qty;
+    if(q > 0) groups[slug][talla] = (groups[slug][talla] || 0) + q;
+  }
+
+  // Build an item for every catalogue entry (empty ones shown as "sin existencias")
+  const items = [];
+  for(const slug in CATALOG){
+    const info = CATALOG[slug];
+    const sizesObj = groups[slug] || {};
+    const sizes = Object.keys(sizesObj)
+      .map(t => ({ talla:t, qty:sizesObj[t] }))
+      .sort(sizeSort);
+    const total = sizes.reduce((s,x) => s + x.qty, 0);
+    items.push({ slug, ...info, sizes, total });
+  }
+  return items;
+}
+
+function sizeSort(a,b){
+  const na = parseFloat(a.talla), nb = parseFloat(b.talla);
+  const aNum = !isNaN(na), bNum = !isNaN(nb);
+  if(aNum && bNum) return na - nb;
+  if(aNum) return -1;
+  if(bNum) return 1;
+  const ia = SIZE_ORDER.indexOf(a.talla), ib = SIZE_ORDER.indexOf(b.talla);
+  return (ia - ib) || a.talla.localeCompare(b.talla);
+}
+
+/* ---------- Rendering ---------- */
+function populateSizes(){
+  const set = new Set();
+  ITEMS.forEach(it => it.sizes.forEach(s => set.add(s.talla)));
+  const list = Array.from(set).map(t => ({talla:t})).sort(sizeSort).map(x => x.talla);
+  const sel = document.getElementById("sizeSel");
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Todas las tallas</option>' +
+    list.map(t => `<option value="${t}">Talla ${t}</option>`).join("");
+  if(list.includes(current)) sel.value = current;
+}
+
+function render(){
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const size = document.getElementById("sizeSel").value;
+  const grid = document.getElementById("grid");
+
+  const visible = ITEMS.filter(it => {
+    // "todos" items belong to every level
+    if(activeLevel !== "todos" && it.level !== activeLevel && it.level !== "todos") return false;
+    if(q && !it.name.toLowerCase().includes(q)) return false;
+    if(size && !it.sizes.some(s => s.talla === size && s.qty > 0)) return false;
+    return true;
+  });
+
+  document.getElementById("count").textContent =
+    `${visible.length} ${visible.length === 1 ? "prenda" : "prendas"} en el catálogo`;
+
+  if(!visible.length){
+    grid.innerHTML = `<div class="status" style="grid-column:1/-1;">No encontramos prendas con esos filtros. Prueba con otra búsqueda.</div>`;
+    return;
+  }
+
+  grid.innerHTML = visible.map(it => {
+    const sizesHTML = it.sizes.length
+      ? `<div class="sizes">` + it.sizes.map(s =>
+          `<span class="sz"><b>${s.talla}</b><span class="qty">${s.qty}</span></span>`).join("") + `</div>`
+      : `<div class="no-stock">Por ahora sin existencias — ¡tu donación ayuda!</div>`;
+    const badgeClass = it.level === "pri" ? "pri" : it.level === "sec" ? "sec" : "";
+    return `
+      <article class="card ${it.total ? "" : "empty"}">
+        <div class="thumb">
+          <img src="${IMG_DIR}${it.img}" alt="${it.name}" loading="lazy"
+               onerror="this.onerror=null;this.src='${IMG_DIR}X.png';">
+        </div>
+        <div class="card-body">
+          <div class="card-head">
+            <h3>${it.name}</h3>
+            <span class="badge ${badgeClass}">${LEVEL_LABEL[it.level]}</span>
+          </div>
+          ${sizesHTML}
+          <div class="card-foot">
+            ${it.total ? `♻️ ${it.total} disponible${it.total === 1 ? "" : "s"}` : "🤍 Aún no disponible"}
+          </div>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function updateImpact(){
+  const totalPrendas = ITEMS.reduce((s,it) => s + it.total, 0);
+  const tipos = ITEMS.filter(it => it.total > 0).length;
+  document.getElementById("pill-prendas").textContent = totalPrendas;
+  document.getElementById("pill-tipos").textContent = tipos;
+}
+
+function stamp(){
+  const d = new Date();
+  document.getElementById("updated").textContent =
+    d.toLocaleTimeString("es-MX", { hour:"2-digit", minute:"2-digit" });
+}
+
+/* ---------- Data load ---------- */
+async function load(){
+  const status = document.getElementById("status");
+  try{
+    const res = await fetch(CSV_URL, { cache:"no-store" });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    ITEMS = buildItems(parseCSV(text));
+    status.style.display = "none";
+    populateSizes();
+    updateImpact();
+    render();
+    stamp();
+  }catch(err){
+    if(!ITEMS.length){
+      status.innerHTML = `<p>No pudimos cargar el inventario en este momento.</p>
+        <p style="font-size:.85rem">${err.message} — se reintentará automáticamente.</p>`;
+      status.style.display = "block";
+    }
+    console.error("Error cargando inventario:", err);
+  }
+}
+
+/* ---------- Events ---------- */
+document.getElementById("search").addEventListener("input", render);
+document.getElementById("sizeSel").addEventListener("change", render);
+document.getElementById("levels").addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  activeLevel = btn.dataset.level;
+  document.querySelectorAll("#levels button").forEach(b => b.classList.toggle("active", b === btn));
+  render();
+});
+
+load();
+setInterval(load, REFRESH_MS);
+</script>
+</body>
+</html>
