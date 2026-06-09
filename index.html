@@ -131,19 +131,41 @@
   }
   .filters button:hover{border-color:var(--green);}
   .filters button.active{background:var(--green);border-color:var(--green);color:#fff;}
-  .size-sel{
+  /* Custom dropdown (matches site styling) */
+  .dropdown{position:relative;}
+  .dd-trigger{
     width:100%;
     padding:12px 15px;
     border:1px solid var(--line);
     border-radius:11px;
     font-size:.95rem;
     background:#fff;color:var(--ink);
-    outline:none;
-    appearance:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7d76' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;
-    background-position:right 15px center;
+    text-align:left;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
   }
+  .dd-trigger:focus,.dd-trigger.open{outline:none;border-color:var(--green);}
+  .dd-trigger .chev{width:14px;height:14px;color:var(--muted);transition:transform .15s;flex:none;}
+  .dd-trigger.open .chev{transform:rotate(180deg);}
+  .dd-panel{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:40;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:0 12px 32px rgba(20,30,60,.16);
+    padding:6px;
+    max-height:288px;overflow:auto;
+  }
+  .dd-panel[hidden]{display:none;}
+  .dd-opt{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 12px;border-radius:8px;
+    font-size:.92rem;color:var(--ink);cursor:pointer;
+    user-select:none;
+  }
+  .dd-opt:hover{background:var(--green-soft);}
+  .dd-opt.sel{color:var(--green);font-weight:600;}
+  .dd-opt .ck{width:15px;height:15px;flex:none;color:var(--green);visibility:hidden;}
+  .dd-opt.sel .ck{visibility:visible;}
 
   /* ===== Grid ===== */
   .grid{
@@ -300,7 +322,13 @@
   <section class="controls">
     <input id="search" type="text" placeholder="Buscar uniforme…" autocomplete="off">
     <div class="filters" id="filters"></div>
-    <select id="sizeSel" class="size-sel"><option value="">Talla: todas</option></select>
+    <div class="dropdown" id="sizeDrop">
+      <button type="button" class="dd-trigger" id="ddTrigger" aria-haspopup="listbox" aria-expanded="false">
+        <span id="ddLabel">Talla: todas</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="dd-panel" id="ddPanel" role="listbox" hidden></div>
+    </div>
   </section>
 
   <!-- Grid -->
@@ -365,8 +393,10 @@ const FILTERS = [
 ];
 
 const SIZE_ORDER = ["CH","M","G","XG"];
+const NO_SIZE = "Única"; // label for stock rows with no size recorded
 let ITEMS = [];
 let activeFilter = "todos";
+let currentSize = "";   // "" = todas
 
 /* ---------- CSV ---------- */
 function parseCSV(text){
@@ -401,9 +431,10 @@ function buildItems(rows){
     const cols = rows[r];
     if(!cols || cols.length < 3) continue;
     const slug  = (cols[iTipo]  || "").trim();
-    const talla = (cols[iTalla] || "").trim();
+    let   talla = (cols[iTalla] || "").trim();
     const qty   = parseInt((cols[iStock] || "").trim(), 10);
     if(!slug || !CATALOG[slug]) continue;
+    if(!talla) talla = NO_SIZE;            // rows with stock but no size
     if(!groups[slug]) groups[slug] = {};
     const q = isNaN(qty) ? 0 : qty;
     if(q > 0) groups[slug][talla] = (groups[slug][talla] || 0) + q;
@@ -426,8 +457,9 @@ function sizeSort(a,b){
   if(aNum && bNum) return na - nb;
   if(aNum) return -1;
   if(bNum) return 1;
-  const ia = SIZE_ORDER.indexOf(a.talla), ib = SIZE_ORDER.indexOf(b.talla);
-  return (ia - ib) || a.talla.localeCompare(b.talla);
+  const ra = SIZE_ORDER.indexOf(a.talla), rb = SIZE_ORDER.indexOf(b.talla);
+  const fa = ra === -1 ? 99 : ra, fb = rb === -1 ? 99 : rb; // unknown letters (e.g. "Única") last
+  return (fa - fb) || a.talla.localeCompare(b.talla);
 }
 
 /* ---------- UI build ---------- */
@@ -436,15 +468,31 @@ function buildFilters(){
     FILTERS.map(f => `<button data-key="${f.key}" class="${f.key==='todos'?'active':''}">${f.label}</button>`).join("");
 }
 
+const CK_ICON = '<svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
 function populateSizes(){
   const set = new Set();
   ITEMS.forEach(it => it.sizes.forEach(s => set.add(s.talla)));
   const list = Array.from(set).map(t => ({talla:t})).sort(sizeSort).map(x => x.talla);
-  const sel = document.getElementById("sizeSel");
-  const current = sel.value;
-  sel.innerHTML = '<option value="">Talla: todas</option>' +
-    list.map(t => `<option value="${t}">Talla: ${t}</option>`).join("");
-  if(list.includes(current)) sel.value = current;
+  if(currentSize && !list.includes(currentSize)) currentSize = ""; // size no longer in stock
+  const opts = [{v:"", t:"todas"}].concat(list.map(t => ({v:t, t})));
+  document.getElementById("ddPanel").innerHTML = opts.map(o =>
+    `<div class="dd-opt ${o.v === currentSize ? "sel" : ""}" role="option" data-val="${o.v}">${CK_ICON}Talla: ${o.t}</div>`
+  ).join("");
+  syncSizeLabel();
+}
+
+function syncSizeLabel(){
+  const sel = currentSize ? `Talla: ${currentSize}` : "Talla: todas";
+  document.getElementById("ddLabel").textContent = sel;
+}
+
+function openDrop(open){
+  const trg = document.getElementById("ddTrigger");
+  const panel = document.getElementById("ddPanel");
+  panel.hidden = !open;
+  trg.classList.toggle("open", open);
+  trg.setAttribute("aria-expanded", String(open));
 }
 
 function matchFilter(it){
@@ -459,7 +507,7 @@ function matchFilter(it){
 
 function render(){
   const q = document.getElementById("search").value.trim().toLowerCase();
-  const size = document.getElementById("sizeSel").value;
+  const size = currentSize;
   const grid = document.getElementById("grid");
 
   const visible = ITEMS.filter(it => {
@@ -532,7 +580,24 @@ async function load(){
 /* ---------- Events ---------- */
 buildFilters();
 document.getElementById("search").addEventListener("input", render);
-document.getElementById("sizeSel").addEventListener("change", render);
+
+// Custom dropdown events
+document.getElementById("ddTrigger").addEventListener("click", e => {
+  e.stopPropagation();
+  openDrop(document.getElementById("ddPanel").hidden);
+});
+document.getElementById("ddPanel").addEventListener("click", e => {
+  const opt = e.target.closest(".dd-opt");
+  if(!opt) return;
+  currentSize = opt.dataset.val;
+  document.querySelectorAll("#ddPanel .dd-opt").forEach(o => o.classList.toggle("sel", o === opt));
+  syncSizeLabel();
+  openDrop(false);
+  render();
+});
+document.addEventListener("click", () => openDrop(false));
+document.addEventListener("keydown", e => { if(e.key === "Escape") openDrop(false); });
+
 document.getElementById("filters").addEventListener("click", e => {
   const btn = e.target.closest("button");
   if(!btn) return;
