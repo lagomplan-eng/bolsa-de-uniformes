@@ -255,10 +255,84 @@
   }
   @keyframes spin{to{transform:rotate(360deg);}}
 
+  /* ===== Circular economy section ===== */
+  .circular{
+    background:linear-gradient(180deg,#f6fbf0 0%, #eef7e3 100%);
+    border-top:1px solid #dcebc6;
+    padding:34px 26px 38px;
+  }
+  .circ-badge{
+    display:inline-flex;align-items:center;gap:7px;
+    background:#EAF3DE;color:var(--green);
+    border:1px solid #C0DD97;
+    font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+    padding:5px 12px;border-radius:999px;
+  }
+  .circ-head{display:flex;align-items:center;gap:11px;margin:16px 0 8px;}
+  .circ-head .leaf-ic{
+    width:42px;height:42px;flex:none;border-radius:12px;
+    background:#EAF3DE;color:var(--green);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .circ-head h2{margin:0;font-size:1.5rem;font-weight:800;color:var(--ink);letter-spacing:-.4px;}
+  .circ-sub{margin:0 0 24px;font-size:.95rem;color:var(--muted);max-width:680px;}
+
+  .flow{
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    margin-bottom:26px;
+  }
+  .flow-step{
+    flex:1;min-width:120px;
+    background:#fff;border:1px solid #C0DD97;border-radius:14px;
+    padding:14px 12px;text-align:center;
+  }
+  .flow-step .fs-num{
+    width:30px;height:30px;margin:0 auto 8px;
+    border-radius:50%;background:var(--green);color:#fff;
+    font-size:.85rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .flow-step .fs-name{font-size:.9rem;font-weight:700;color:var(--ink);}
+  .flow-arrow{color:var(--green);flex:none;display:flex;}
+  .flow-arrow svg{width:20px;height:20px;}
+
+  .circ-cards{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px;
+  }
+  .cc{
+    background:#fff;border:1px solid #C0DD97;border-radius:14px;
+    padding:16px 17px;display:flex;flex-direction:column;gap:7px;
+  }
+  .cc-ic{
+    width:38px;height:38px;border-radius:10px;
+    background:#EAF3DE;color:var(--green);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .cc h3{margin:2px 0 0;font-size:1rem;font-weight:700;color:var(--ink);}
+  .cc p{margin:0;font-size:.85rem;color:var(--muted);}
+  .cc-link{
+    color:#2e7d5e;font-size:11px;font-weight:500;text-decoration:none;
+    margin-top:2px;display:inline-block;
+  }
+  .cc-link:hover{text-decoration:underline;}
+
+  .circ-highlight{
+    background:#EAF3DE;border:1px solid #C0DD97;border-radius:14px;
+    padding:16px 18px;
+    display:flex;align-items:flex-start;gap:11px;
+    font-size:.92rem;color:var(--green-dark);
+  }
+  .circ-highlight .hl-ic{color:var(--green);flex:none;margin-top:1px;}
+  .circ-highlight b{color:var(--green);}
+
   @media(max-width:680px){
     .app{margin:0;border-radius:0;}
     .hero h1{font-size:1.45rem;}
     .grid{grid-template-columns:1fr;}
+    .flow{flex-direction:column;align-items:stretch;}
+    .flow-step{min-width:0;}
+    .flow-arrow{transform:rotate(90deg);align-self:center;}
+    .circ-cards{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -335,6 +409,76 @@
   <div id="grid" class="grid">
     <div class="status-msg"><div class="spinner"></div>Cargando inventario…</div>
   </div>
+
+  <!-- Circular economy -->
+  <section class="circular">
+    <span class="circ-badge">
+      <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Economía circular
+    </span>
+
+    <div class="circ-head">
+      <span class="leaf-ic">
+        <svg class="i" style="width:1.4rem;height:1.4rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>
+      </span>
+      <h2>Lo que no se reusa, se recicla</h2>
+    </div>
+    <p class="circ-sub">Ninguna prenda termina en la basura. Las prendas que ya no pueden usarse se transforman
+      en algo nuevo — y lo que generamos lo usamos para apoyar causas que importan.</p>
+
+    <!-- 4-step flow -->
+    <div class="flow">
+      <div class="flow-step"><div class="fs-num">1</div><div class="fs-name">Donas</div></div>
+      <span class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      <div class="flow-step"><div class="fs-num">2</div><div class="fs-name">Clasificamos</div></div>
+      <span class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      <div class="flow-step"><div class="fs-num">3</div><div class="fs-name">Transformamos</div></div>
+      <span class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      <div class="flow-step"><div class="fs-num">4</div><div class="fs-name">Apoyamos</div></div>
+    </div>
+
+    <!-- 4 cards -->
+    <div class="circ-cards">
+      <div class="cc">
+        <span class="cc-ic">
+          <svg class="i" style="width:1.25rem;height:1.25rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="3"/><path d="M12 9v3m0 0l-3 4m3-4l3 4M8 12h8"/></svg>
+        </span>
+        <h3>Uniformes para muñecas</h3>
+        <p>Con las prendas que ya no se pueden reusar confeccionamos uniformes a escala para muñecas y peluches.</p>
+        <a class="cc-link" href="https://issuu.com/ccm_polanco/docs/uniformes_peluches_y_mun_ecas" target="_blank" rel="noopener">Ver catálogo de muñecas →</a>
+      </div>
+      <div class="cc">
+        <span class="cc-ic">
+          <svg class="i" style="width:1.25rem;height:1.25rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </span>
+        <h3>Ventas con propósito</h3>
+        <p>Lo que se genera con estos productos se reinvierte en causas que benefician a la comunidad.</p>
+      </div>
+      <div class="cc">
+        <span class="cc-ic">
+          <svg class="i" style="width:1.25rem;height:1.25rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <h3>Comunidad que decide</h3>
+        <p>Las familias del colegio eligen juntas a qué causas se destina el impacto generado.</p>
+      </div>
+      <div class="cc">
+        <span class="cc-ic">
+          <svg class="i" style="width:1.25rem;height:1.25rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m5 0V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"/></svg>
+        </span>
+        <h3>Cero a la basura</h3>
+        <p>Ninguna prenda termina en el bote. Todo se reusa, se transforma o se recicla.</p>
+      </div>
+    </div>
+
+    <!-- Highlight -->
+    <div class="circ-highlight">
+      <span class="hl-ic">
+        <svg class="i" style="width:1.25rem;height:1.25rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 16v-4m0-4h.01"/></svg>
+      </span>
+      <span>¿Tienes prendas que ya no sirven para reusar? <b>Tráelas igual</b> — las recibimos,
+        las transformamos y el impacto sigue. Cada hilo cuenta.</span>
+    </div>
+  </section>
 
   <!-- Footer -->
   <footer class="appfoot">
