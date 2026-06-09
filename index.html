@@ -29,12 +29,25 @@
   /* Top bar */
   .topbar{
     background:var(--navy);
-    padding:14px 20px;
+    padding:16px 20px;
+  }
+  .topbar-inner{
+    max-width:1040px;
+    margin:0 auto;
     display:flex;
     align-items:center;
-    justify-content:center;
+    gap:18px;
   }
-  .topbar img{height:54px;width:auto;display:block;}
+  .topbar .logo{height:46px;width:auto;display:block;}
+  .topbar .divider{
+    width:1px;
+    height:42px;
+    background:rgba(255,255,255,.28);
+    flex:none;
+  }
+  .brand{display:flex;flex-direction:column;line-height:1.25;}
+  .brand-title{color:#fff;font-weight:700;font-size:1.18rem;letter-spacing:-.2px;}
+  .brand-sub{color:rgba(255,255,255,.6);font-size:.85rem;}
 
   /* Hero */
   .hero{
@@ -271,7 +284,14 @@
 <body>
 
   <div class="topbar">
-    <img src="imágenes/Logo ccm horizontal blanco.png" alt="Colegio Ciudad de México">
+    <div class="topbar-inner">
+      <img class="logo" src="imágenes/Logo ccm horizontal blanco.png" alt="Colegio Ciudad de México">
+      <span class="divider"></span>
+      <div class="brand">
+        <span class="brand-title">Bolsa de uniformes</span>
+        <span class="brand-sub">Donaciones y reciclaje</span>
+      </div>
+    </div>
   </div>
 
   <header class="hero">
@@ -313,7 +333,7 @@
 
     <div class="meta-row">
       <span id="count">Cargando…</span>
-      <span class="refresh-note"><span class="dot"></span> Se actualiza cada 5 minutos · <span id="updated">—</span></span>
+      <span class="refresh-note"><span class="dot"></span> Inventario en vivo · actualizado <span id="updated">—</span></span>
     </div>
 
     <div id="grid" class="grid"></div>
@@ -329,9 +349,12 @@
   </footer>
 
 <script>
-const CSV_URL = "https://corsproxy.io/?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2Fe%2F2PACX-1vTECN_ZotXxL3qlrNVMHQ1JVXzfHyLVUVwevpOznWTBCRZsKnhpFvMXJCLS525I0RrnogefxvhpczAV%2Fpub%3Fgid%3D1306504336%26single%3Dtrue%26output%3Dcsv";
+// Live "gviz" endpoint — reads the sheet directly (no 5-min publish cache), wrapped in a CORS proxy for the browser.
+const CSV_URL = "https://corsproxy.io/?url=" + encodeURIComponent(
+  "https://docs.google.com/spreadsheets/d/1tzWm-bLqIZKHxMF6pgcpankSBhZBqIO10RtaGyfiV1o/gviz/tq?tqx=out:csv&sheet=INVENTORY_CURRENT"
+);
 const IMG_DIR = "imágenes/";
-const REFRESH_MS = 5 * 60 * 1000;
+const REFRESH_MS = 30 * 1000;
 
 // slug -> { name, img, level }
 const CATALOG = {
