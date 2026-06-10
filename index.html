@@ -531,7 +531,7 @@ const CATALOG = {
   "JUMPER-PRI":               { name:"Jumper",               img:"Jumper.png",               level:"pri",   sub:"Kinder y Primaria" },
   "PANTALON/DEPORTIVO-TODOS": { name:"Pantalón deportivo",   img:"Pantalon-deportivo.png",   level:"todos", sub:"Todos los niveles" },
   "PANTALON/VESTIR-PRI":      { name:"Pantalón de vestir",   img:"Pantalon-vestir.png",      level:"pri",   sub:"Kinder y Primaria" },
-  "PLAYERA-SEC/PREP":         { name:"Playera",              img:"Polo.png",                 level:"sec",   sub:"Secundaria y Prepa" },
+  "PLAYERA-SEC/PREP":         { name:"Playera",              img:"Playera-cuelloV.png",      level:"sec",   sub:"Secundaria y Prepa" },
   "PLAYERAV-SEC/PREP":        { name:"Playera V",            img:"Playera-cuelloV.png",      level:"sec",   sub:"Secundaria y Prepa · escote V" },
   "PLAYERA/POLO":             { name:"Playera polo",         img:"Polo.png",                 level:"sec",   sub:"Sec/Prepa · Plantel Polanco" },
   "POLO/LARGA-TODOS":         { name:"Polo manga larga",     img:"Polo-manga-larga.png",     level:"todos", sub:"Todos los niveles" },
@@ -580,6 +580,7 @@ function parseCSV(text){
 function buildItems(rows){
   if(!rows.length) return [];
   const header = rows[0].map(h => h.trim().toLowerCase());
+  const iSku   = header.indexOf("sku");
   const iTipo  = header.indexOf("tipo");
   const iTalla = header.indexOf("talla");
   const iStock = header.indexOf("stock");
@@ -592,6 +593,10 @@ function buildItems(rows){
     let   talla = (cols[iTalla] || "").trim();
     const qty   = parseInt((cols[iStock] || "").trim(), 10);
     if(!slug || !CATALOG[slug]) continue;
+    if(!talla){                            // Talla cell empty: recover size from SKU suffix (e.g. "..._CH")
+      const suffix = ((cols[iSku] || "").trim().split("_").pop() || "").toUpperCase();
+      if(SIZE_ORDER.includes(suffix)) talla = suffix;
+    }
     if(!talla) talla = NO_SIZE;            // rows with stock but no size
     if(!groups[slug]) groups[slug] = {};
     const q = isNaN(qty) ? 0 : qty;
