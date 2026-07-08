@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolsa de Uniformes — Admin · CCM Polanco</title>
+<style>
+:root{--green:#2D6A2D;--green-light:#EAF3DE;--green-dark:#1A4A1A;--green-mid:#3B6D11;--blue:#185FA5;--blue-light:#E6F1FB;--amber:#7A5200;--amber-light:#FEF3CD;--purple:#3C3489;--purple-light:#EEEDFE;--red:#A32D2D;--red-light:#FCEBEB;--g0:#fff;--g1:#f8f8f6;--g2:#f2f2ef;--g3:#e6e6e2;--g4:#c4c4be;--g5:#888882;--g6:#444440;--g7:#1a1a18;--radius:8px;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--mono:'SF Mono','Fira Code',monospace;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--g1);color:var(--g7);font-size:14px;line-height:1.5;min-height:100vh;}
+
+/* LOGIN */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:linear-gradient(135deg,var(--green-dark),#0d3d2d);}
+.login-box{background:var(--g0);border-radius:14px;padding:2rem;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.login-logo{width:48px;height:48px;background:var(--green-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;margin:0 auto 1rem;}
+.login-box h1{font-size:19px;font-weight:700;text-align:center;margin-bottom:4px;}
+.login-box .sub{font-size:13px;color:var(--g5);text-align:center;margin-bottom:1.5rem;}
+.login-field{margin-bottom:1rem;}
+.login-field label{display:block;font-size:12px;font-weight:600;color:var(--g6);margin-bottom:5px;}
+.login-field input{width:100%;padding:10px 12px;border:1px solid var(--g3);border-radius:var(--radius);font-size:14px;font-family:var(--font);}
+.login-field input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(45,106,45,.1);}
+.login-btn{width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);margin-top:.5rem;}
+.login-btn:hover{background:var(--green-dark);}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-err{background:var(--red-light);color:var(--red);padding:9px 12px;border-radius:var(--radius);font-size:12px;margin-bottom:1rem;display:none;}
+.login-err.show{display:block;}
+.login-note{font-size:11px;color:var(--g5);text-align:center;margin-top:1rem;line-height:1.5;}
+
+/* APP (hidden until login) */
+.app-shell{display:none;}
+.app-shell.on{display:block;}
+.topbar{background:var(--green-dark);color:#fff;padding:0 1.5rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-l{display:flex;align-items:center;gap:10px;}
+.tb-logo{width:32px;height:32px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;}
+.tb-title{font-size:14px;font-weight:600;}.tb-sub{font-size:11px;opacity:.6;}
+.tb-r{display:flex;align-items:center;gap:12px;}
+.tb-user{font-size:12px;opacity:.8;}
+.tb-logout{font-size:12px;color:#fff;background:rgba(255,255,255,.15);border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:var(--font);}
+.tb-logout:hover{background:rgba(255,255,255,.25);}
+.wrap{max-width:900px;margin:0 auto;padding:1.5rem 1rem 4rem;}
+.sync-status{font-size:11px;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;margin-bottom:1rem;}
+.sync-ok{background:var(--green-light);color:var(--green-dark);}
+.sync-loading{background:var(--amber-light);color:var(--amber);}
+.sync-err{background:var(--red-light);color:var(--red);}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:1.5rem;}
+.scard{background:var(--g0);border:1px solid var(--g3);border-radius:var(--radius);padding:12px 8px;text-align:center;}
+.scard .n{font-size:22px;font-weight:700;line-height:1;}.scard .l{font-size:10px;color:var(--g5);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+.sg{color:var(--green);}.sb{color:var(--blue);}.sa{color:var(--amber);}.sp{color:var(--purple);}.sc{color:#1A6080;}
+.tabs{display:flex;border-bottom:1px solid var(--g3);margin-bottom:1.5rem;}
+.tbtn{padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;font-size:13px;font-weight:500;color:var(--g5);cursor:pointer;font-family:var(--font);margin-bottom:-1px;transition:all .15s;}
+.tbtn:hover{color:var(--g7);}.tbtn.on{color:var(--green);border-bottom-color:var(--green);}
+.tab{display:none;}.tab.on{display:block;}
+.card{background:var(--g0);border:1px solid var(--g3);border-radius:10px;padding:1.25rem;margin-bottom:1rem;}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.ct{font-size:11px;font-weight:700;color:var(--g5);text-transform:uppercase;letter-spacing:.05em;}
+.badge{font-size:11px;background:var(--g2);border:1px solid var(--g3);border-radius:20px;padding:2px 10px;color:var(--g5);}
+.legend{display:flex;gap:.8rem;flex-wrap:wrap;padding:10px 12px;background:var(--g1);border-radius:var(--radius);margin-bottom:1rem;border:1px solid var(--g3);}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--g6);}
+.ld{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.item-block{border:1px solid var(--g3);border-radius:var(--radius);padding:1rem;margin-bottom:10px;background:var(--g1);}
+.item-block.bd-dona{border-left:3px solid var(--green);}.item-block.bd-toma{border-left:3px solid var(--blue);}
+.item-block.bd-trans{border-left:3px solid #B8860B;}.item-block.bd-reci{border-left:3px solid var(--purple);}
+.itop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.ilbl{font-size:12px;font-weight:600;color:var(--g5);}
+.rmbtn{width:24px;height:24px;border-radius:50%;background:none;border:1px solid var(--g3);color:var(--g5);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1;}
+.rmbtn:hover{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.apills{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
+.apill{padding:7px 4px;border:1px solid var(--g3);border-radius:var(--radius);background:var(--g0);font-size:11px;cursor:pointer;text-align:center;color:var(--g5);font-family:var(--font);font-weight:500;transition:all .1s;line-height:1.4;}
+.apill:hover{border-color:var(--g4);color:var(--g7);}
+.p-dona{background:var(--green-light)!important;border-color:var(--green-mid)!important;color:var(--green-dark)!important;}
+.p-toma{background:var(--blue-light)!important;border-color:var(--blue)!important;color:#0C447C!important;}
+.p-trans{background:var(--amber-light)!important;border-color:#B8860B!important;color:var(--amber)!important;}
+.p-reci{background:var(--purple-light)!important;border-color:#534AB7!important;color:var(--purple)!important;}
+.frow{display:grid;grid-template-columns:2fr 1fr .9fr;gap:8px;}
+.fl label{display:block;font-size:11px;font-weight:600;color:var(--g5);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+select,input[type="number"],textarea{width:100%;padding:8px 10px;border:1px solid var(--g3);border-radius:var(--radius);background:var(--g0);color:var(--g7);font-size:13px;font-family:var(--font);}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(45,106,45,.1);}
+textarea{resize:vertical;min-height:60px;}
+.addbtn{width:100%;padding:10px;border:1.5px dashed var(--g3);border-radius:var(--radius);background:transparent;color:var(--g5);font-size:13px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px;margin-bottom:1rem;transition:all .15s;}
+.addbtn:hover{border-color:var(--green);color:var(--green);background:var(--green-light);}
+.savebtn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);}
+.savebtn:hover{background:var(--green-dark);}
+.savebtn:disabled{opacity:.6;cursor:not-allowed;}
+.inv-top{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.ist{border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.ist.ok{background:var(--green-light);border:1px solid #b5d98a;}
+.ist.low{background:var(--amber-light);border:1px solid #f5cb7a;}
+.ist.zero{background:var(--red-light);border:1px solid #f7c1c1;}
+.isn{font-size:28px;font-weight:700;line-height:1;}
+.ist.ok .isn{color:var(--green);}.ist.low .isn{color:var(--amber);}.ist.zero .isn{color:var(--red);}
+.isl{font-size:12px;font-weight:600;}.iss{font-size:11px;color:var(--g5);margin-top:1px;}
+.inv-filters{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.inv-search{flex:1;min-width:160px;padding:7px 10px;border:1px solid var(--g3);border-radius:var(--radius);font-size:13px;font-family:var(--font);background:var(--g0);color:var(--g7);}
+.inv-search:focus{outline:none;border-color:var(--green);}
+.fltbtn{padding:6px 12px;border:1px solid var(--g3);border-radius:20px;background:var(--g0);font-size:12px;cursor:pointer;font-family:var(--font);color:var(--g6);transition:all .1s;}
+.fltbtn:hover{border-color:var(--g4);}.fltbtn.on{background:var(--g7);color:#fff;border-color:var(--g7);}
+.itw{overflow-x:auto;}
+.itbl{width:100%;border-collapse:collapse;font-size:12px;}
+.itbl th{font-size:10px;font-weight:700;color:var(--g5);text-align:left;padding:8px 10px;border-bottom:1px solid var(--g3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;background:var(--g1);}
+.itbl td{padding:9px 10px;border-bottom:1px solid var(--g2);vertical-align:middle;}
+.itbl tr:last-child td{border-bottom:none;}.itbl tr:hover td{background:var(--g1);}
+.ttag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:5px;font-weight:500;}
+.tag-s{background:#E6F1FB;color:#0C447C;}.tag-p{background:#EAF3DE;color:var(--green-dark);}.tag-a{background:var(--g2);color:var(--g5);}
+.np{color:var(--green);font-weight:600;}.nm{color:var(--g5);}
+.sbw{display:flex;align-items:center;gap:8px;}
+.sb-bar{height:6px;border-radius:3px;background:var(--g3);flex:1;overflow:hidden;max-width:60px;}
+.sbf{height:100%;border-radius:3px;}
+.f-ok{background:var(--green);}.f-low{background:#E09B00;}.f-zero{background:var(--red);}
+.sn{font-weight:700;min-width:24px;text-align:right;font-size:13px;}
+.sn-ok{color:var(--green);}.sn-low{color:var(--amber);}.sn-zero{color:var(--red);}
+.nr td{opacity:.4;}
+.hfilt{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
+.hfbtn{padding:5px 12px;border:1px solid var(--g3);border-radius:20px;background:var(--g0);font-size:12px;cursor:pointer;font-family:var(--font);color:var(--g6);transition:all .1s;display:flex;align-items:center;gap:5px;}
+.hfbtn:hover{border-color:var(--g4);}.hfbtn.on{background:var(--g7);color:#fff;border-color:var(--g7);}
+.hfdot{width:7px;height:7px;border-radius:50%;}
+.dg{margin-bottom:1.5rem;}
+.dlbl{font-size:11px;font-weight:700;color:var(--g5);text-transform:uppercase;letter-spacing:.06em;padding:0 0 8px;border-bottom:1px solid var(--g3);}
+.sblk{border:1px solid var(--g3);border-radius:var(--radius);margin-top:10px;overflow:hidden;}
+.shd{background:var(--g1);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--g3);flex-wrap:wrap;gap:6px;}
+.sid{font-size:10px;font-weight:700;color:var(--g5);font-family:var(--mono);letter-spacing:.04em;}
+.stm{font-size:11px;color:var(--g5);}
+.spills{display:flex;gap:4px;flex-wrap:wrap;}
+.spill{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;}
+.hr{display:grid;grid-template-columns:90px 1fr 56px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--g2);}
+.hr:last-child{border-bottom:none;}
+.hb{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-align:center;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
+.hb-d{background:var(--green-light);color:var(--green-dark);}
+.hb-t{background:var(--blue-light);color:#0C447C;}
+.hb-tr{background:var(--amber-light);color:var(--amber);}
+.hb-r{background:var(--purple-light);color:var(--purple);}
+.hn{font-size:12px;font-weight:500;}.hs{font-size:11px;color:var(--g5);margin-top:1px;}
+.hq{font-size:15px;font-weight:700;text-align:right;}
+.hqp{color:var(--green);}.hqm{color:var(--red);}
+.hempty{text-align:center;padding:2rem;color:var(--g4);font-size:13px;}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--g4);}
+.ei{font-size:36px;margin-bottom:8px;}.empty p{font-size:13px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g7);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:200;transition:transform .3s ease;white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}.toast.err{background:var(--red);}.toast.ok{background:var(--green);}
+.config-warn{background:var(--amber-light);border:1px solid #f5cb7a;color:var(--amber);padding:1rem;border-radius:var(--radius);margin-bottom:1rem;font-size:13px;}
+.config-warn code{background:rgba(0,0,0,.08);padding:1px 5px;border-radius:3px;font-family:var(--mono);}
+@media(max-width:640px){.stats-row{grid-template-columns:repeat(3,1fr);}.apills{grid-template-columns:repeat(2,1fr);}.frow{grid-template-columns:1fr;}.hr{grid-template-columns:70px 1fr 44px;}}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN SCREEN ═══ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">CCM</div>
+    <h1>Bolsa de Uniformes</h1>
+    <div class="sub">Panel de administración · Comité Ambiental</div>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-field">
+      <label>Correo electrónico</label>
+      <input type="email" id="login-email" placeholder="tu@correo.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Contraseña</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Iniciar sesión</button>
+    <div class="login-note">Solo miembros del comité con cuenta autorizada.<br>¿Problemas para entrar? Contacta al administrador.</div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div class="app-shell" id="app-shell">
+  <div class="topbar">
+    <div class="tb-l">
+      <div class="tb-logo">CCM</div>
+      <div><div class="tb-title">Bolsa de Uniformes</div><div class="tb-sub">Panel de administración · Polanco</div></div>
+    </div>
+    <div class="tb-r">
+      <span class="tb-user" id="tb-user"></span>
+      <button class="tb-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="config-warn" class="config-warn" style="display:none">
+      ⚠️ <strong>Falta configurar Supabase.</strong> Edita las líneas <code>SUPABASE_URL</code> y <code>SUPABASE_KEY</code> al inicio del script con los datos de tu proyecto.
+    </div>
+
+    <div class="sync-status sync-loading" id="sync-status"><span class="sync-dot"></span><span id="sync-text">Conectando…</span></div>
+
+    <div class="stats-row">
+      <div class="scard"><div class="n"><span class="sg">+</span><span id="s-d">0</span></div><div class="l">Donadas</div></div>
+      <div class="scard"><div class="n"><span class="sb">−</span><span id="s-t">0</span></div><div class="l">Reusadas</div></div>
+      <div class="scard"><div class="n"><span class="sa">−</span><span id="s-tr">0</span></div><div class="l">Transferidas</div></div>
+      <div class="scard"><div class="n"><span class="sp">−</span><span id="s-r">0</span></div><div class="l">Recicladas</div></div>
+      <div class="scard"><div class="n"><span>=</span><span id="s-s">0</span></div><div class="l">Stock</div></div>
+      <div class="scard"><div class="n"><span class="sc" id="s-p">0</span></div><div class="l">Registros</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tbtn on" onclick="showTab('registro')">📋 Registro</button>
+      <button class="tbtn" onclick="showTab('inventario')">📦 Inventario</button>
+      <button class="tbtn" onclick="showTab('historial')">🕐 Historial</button>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="tab-registro" class="tab on">
+      <div class="card">
+        <div class="ch"><span class="ct">Prendas a registrar</span><span class="badge" id="item-count">1 prenda</span></div>
+        <div class="legend">
+          <div class="li"><div class="ld" style="background:var(--green)"></div>Donando <strong>suma</strong></div>
+          <div class="li"><div class="ld" style="background:var(--blue)"></div>Reusando <strong>resta</strong></div>
+          <div class="li"><div class="ld" style="background:#B8860B"></div>Transfiriendo <strong>resta</strong></div>
+          <div class="li"><div class="ld" style="background:var(--purple)"></div>Reciclado <strong>resta</strong></div>
+        </div>
+        <div id="items-container"></div>
+        <button class="addbtn" onclick="addItem()" id="add-btn">＋ Agregar otra prenda (máx. 10)</button>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">Notas</span></div>
+        <div class="fl"><label>Observaciones (opcional)</label>
+          <textarea id="notes" placeholder="Condición de las prendas, evento, donante, etc."></textarea>
+        </div>
+      </div>
+      <button class="savebtn" id="save-btn" onclick="submitForm()">✓ Guardar registro</button>
+    </div>
+
+    <!-- INVENTARIO -->
+    <div id="tab-inventario" class="tab">
+      <div class="inv-top">
+        <div class="ist ok"><div class="isn" id="inv-ok">0</div><div><div class="isl" style="color:var(--green)">Con stock</div><div class="iss">Más de 3 piezas</div></div></div>
+        <div class="ist low"><div class="isn" id="inv-low">0</div><div><div class="isl" style="color:var(--amber)">Stock bajo</div><div class="iss">1 a 3 piezas</div></div></div>
+        <div class="ist zero"><div class="isn" id="inv-zero">0</div><div><div class="isl" style="color:var(--red)">Sin stock</div><div class="iss">0 piezas</div></div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">Stock por SKU</span><span class="badge" id="inv-sku-count">—</span></div>
+        <div class="inv-filters">
+          <input class="inv-search" type="text" id="inv-search" placeholder="Buscar tipo o talla…" oninput="renderInventory()">
+          <button class="fltbtn on" onclick="setInvF('all',this)">Todos</button>
+          <button class="fltbtn" onclick="setInvF('ok',this)">✅ OK</button>
+          <button class="fltbtn" onclick="setInvF('low',this)">⚠️ Bajo</button>
+          <button class="fltbtn" onclick="setInvF('zero',this)">🔴 Sin stock</button>
+        </div>
+        <div class="itw" id="inv-table-wrap"><div class="empty"><div class="ei">📦</div><p>Cargando…</p></div></div>
+      </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div id="tab-historial" class="tab">
+      <div class="card">
+        <div class="ch"><span class="ct">Movimientos</span><span class="badge" id="hist-count">0</span></div>
+        <div class="hfilt">
+          <button class="hfbtn on" onclick="setHF('all',this)">Todos</button>
+          <button class="hfbtn" onclick="setHF('DONATION_IN',this)"><span class="hfdot" style="background:var(--green)"></span>Donando</button>
+          <button class="hfbtn" onclick="setHF('TAKE_OUT',this)"><span class="hfdot" style="background:var(--blue)"></span>Reusando</button>
+          <button class="hfbtn" onclick="setHF('TRANSFER_OUT',this)"><span class="hfdot" style="background:#B8860B"></span>Transfiriendo</button>
+          <button class="hfbtn" onclick="setHF('RECYCLE_OUT',this)"><span class="hfdot" style="background:var(--purple)"></span>Reciclado</button>
+        </div>
+        <div id="history-list"><div class="hempty">Cargando…</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ⚙️  CONFIGURACIÓN — Pega aquí los datos de tu proyecto Supabase
+   Los encuentras en: Supabase → Project Settings → API
+   ═══════════════════════════════════════════════════════════ */
+const SUPABASE_URL = 'https://rwtscnlmuhegodxizplf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3dHNjbmxtdWhlZ29keGl6cGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0Mjk4NzMsImV4cCI6MjA5OTAwNTg3M30.7A-dzZce2rRo2xqCkn5lgtTqidL71KLFH9JANHLns9g';
+/* ═══════════════════════════════════════════════════════════ */
+
+const TYPES=['BATA/LABORATORIO-SEC/PREP','CHALECO-TODOS','CHAMARRA/DEPORTIVA-TODOS','CHAMARRA/INVIERNO-TODOS','HOODIE-SEC/PREP','JUMPER-PRI','PANTALON/DEPORTIVO-TODOS','PANTALON/VESTIR-PRI','PLAYERA-SEC/PREP','PLAYERAV-SEC/PREP','PLAYERA/POLO','POLO/LARGA-TODOS','SHORT-TODOS','SUETER/ABIERTO-PRI','SUETER/CERRADO-PRI','SUETER/DEPORTIVO-SEC/PREP'];
+const SIZES=['0','2','4','6','8','10','12','14','16','18','20','28','30','32','34','36','38','40','CH','M','G','XG'];
+const ACTS=[
+  {code:'DONATION_IN', label:'Donando al programa',      short:'Donando',       sign:1,  psel:'p-dona', bd:'bd-dona', hb:'hb-d'},
+  {code:'TAKE_OUT',    label:'Reusando',                  short:'Reusando',      sign:-1, psel:'p-toma', bd:'bd-toma', hb:'hb-t'},
+  {code:'TRANSFER_OUT',label:'Transfiriendo a otra org.', short:'Transfiriendo', sign:-1, psel:'p-trans',bd:'bd-trans',hb:'hb-tr'},
+  {code:'RECYCLE_OUT', label:'Reciclado',                 short:'Reciclado',     sign:-1, psel:'p-reci', bd:'bd-reci', hb:'hb-r'},
+];
+
+let sb=null, currentUser=null;
+let items=[], txs=[], invF='all', histF='all';
+
+function byC(c){return ACTS.find(a=>a.code===c)||ACTS[0];}
+function tag(tipo){if(tipo.includes('SEC/PREP'))return'<span class="ttag tag-s">SEC/PREP</span>';if(tipo.includes('PRI'))return'<span class="ttag tag-p">PRI</span>';return'<span class="ttag tag-a">TODOS</span>';}
+function base(tipo){return tipo.replace(/-SEC\/PREP|-PRI|-TODOS/g,'');}
+
+/* ── Init: check config & session ── */
+function initApp(){
+  if(SUPABASE_URL.includes('TU-PROYECTO')||SUPABASE_KEY.includes('TU-ANON-KEY')){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-shell').classList.add('on');
+    document.getElementById('config-warn').style.display='block';
+    document.getElementById('sync-status').style.display='none';
+    items=[{accion:'DONATION_IN',tipo:'',talla:'',cantidad:''}];
+    renderItems();
+    return;
+  }
+  sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  sb.auth.getSession().then(({data})=>{
+    if(data.session){onLoggedIn(data.session.user);}
+  });
+}
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-password').value;
+  const err=document.getElementById('login-err');
+  const btn=document.getElementById('login-btn');
+  err.classList.remove('show');
+  if(!email||!pw){err.textContent='Ingresa tu correo y contraseña';err.classList.add('show');return;}
+  btn.disabled=true;btn.textContent='Entrando…';
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
+  btn.disabled=false;btn.textContent='Iniciar sesión';
+  if(error){err.textContent='Correo o contraseña incorrectos';err.classList.add('show');return;}
+  onLoggedIn(data.user);
+}
+
+function onLoggedIn(user){
+  currentUser=user;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-shell').classList.add('on');
+  document.getElementById('tb-user').textContent=user.email;
+  items=[{accion:'DONATION_IN',tipo:'',talla:'',cantidad:''}];
+  renderItems();
+  loadFromCloud();
+  subscribeRealtime();
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  location.reload();
+}
+
+/* ── Load data from Supabase ── */
+async function loadFromCloud(){
+  setSync('loading','Cargando…');
+  const {data,error}=await sb.from('movimientos').select('*').order('creado_en',{ascending:true});
+  if(error){setSync('err','Error al cargar');console.error(error);return;}
+  txs=data.map(r=>({ts:r.creado_en,pid:r.sesion_id,accion:r.accion,tipo:r.tipo,talla:r.talla,cantidad:r.cantidad,notas:r.notas||'',por:r.registrado_por}));
+  setSync('ok','Sincronizado');
+  updateStats();renderInventory();renderHistory();
+}
+
+/* ── Realtime: refresh when anyone adds data ── */
+function subscribeRealtime(){
+  sb.channel('movimientos-changes')
+    .on('postgres_changes',{event:'*',schema:'public',table:'movimientos'},()=>{loadFromCloud();})
+    .subscribe();
+}
+
+function setSync(state,text){
+  const el=document.getElementById('sync-status');
+  el.className='sync-status sync-'+(state==='ok'?'ok':state==='err'?'err':'loading');
+  document.getElementById('sync-text').textContent=text;
+}
+
+/* ── Stats ── */
+function getStats(){
+  let d=0,t=0,tr=0,r=0,pids=new Set();
+  txs.forEach(x=>{const q=parseInt(x.cantidad)||0;pids.add(x.pid);
+    if(x.accion==='DONATION_IN')d+=q;else if(x.accion==='TAKE_OUT')t+=q;
+    else if(x.accion==='TRANSFER_OUT')tr+=q;else if(x.accion==='RECYCLE_OUT')r+=q;});
+  return{d,t,tr,r,s:d-t-tr-r,p:pids.size};
+}
+function updateStats(){const s=getStats();document.getElementById('s-d').textContent=s.d;document.getElementById('s-t').textContent=s.t;document.getElementById('s-tr').textContent=s.tr;document.getElementById('s-r').textContent=s.r;document.getElementById('s-s').textContent=s.s;document.getElementById('s-p').textContent=s.p;}
+function getInv(){
+  const inv={};
+  txs.forEach(x=>{const k=x.tipo+'||'+x.talla;
+    if(!inv[k])inv[k]={tipo:x.tipo,talla:x.talla,d:0,t:0,tr:0,r:0};
+    const q=parseInt(x.cantidad)||0;
+    if(x.accion==='DONATION_IN')inv[k].d+=q;else if(x.accion==='TAKE_OUT')inv[k].t+=q;
+    else if(x.accion==='TRANSFER_OUT')inv[k].tr+=q;else if(x.accion==='RECYCLE_OUT')inv[k].r+=q;});
+  return Object.values(inv).map(e=>({...e,stock:e.d-e.t-e.tr-e.r}));
+}
+
+/* ── Registro form ── */
+function renderItems(){
+  const c=document.getElementById('items-container');c.innerHTML='';
+  items.forEach((item,i)=>{
+    const a=byC(item.accion);const div=document.createElement('div');
+    div.className='item-block '+a.bd;
+    div.innerHTML=`<div class="itop"><span class="ilbl">Prenda #${i+1}${i===0?' — obligatoria':' — opcional'}</span>${i>0?`<button class="rmbtn" onclick="removeItem(${i})">&times;</button>`:''}</div>
+    <div class="apills">${ACTS.map(ax=>`<button class="apill ${item.accion===ax.code?ax.psel:''}" onclick="setAct(${i},'${ax.code}')">${ax.label}</button>`).join('')}</div>
+    <div class="frow">
+      <div class="fl"><label>Tipo de prenda</label><select onchange="upd(${i},'tipo',this.value)"><option value="">Selecciona…</option>${TYPES.map(t=>`<option value="${t}"${item.tipo===t?' selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="fl"><label>Talla</label><select onchange="upd(${i},'talla',this.value)"><option value="">Talla…</option>${SIZES.map(s=>`<option value="${s}"${item.talla===s?' selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="fl"><label>Cantidad</label><input type="number" min="1" max="100" value="${item.cantidad||''}" placeholder="0" onchange="upd(${i},'cantidad',this.value)"></div>
+    </div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('item-count').textContent=items.length+(items.length===1?' prenda':' prendas');
+  document.getElementById('add-btn').style.display=items.length>=10?'none':'flex';
+}
+function setAct(i,c){items[i].accion=c;renderItems();}
+function upd(i,f,v){items[i][f]=v;}
+function removeItem(i){items.splice(i,1);renderItems();}
+function addItem(){if(items.length<10){items.push({accion:'DONATION_IN',tipo:'',talla:'',cantidad:''});renderItems();}}
+
+async function submitForm(){
+  const valid=items.filter(it=>it.tipo&&it.talla&&it.cantidad&&parseInt(it.cantidad)>0);
+  if(!valid.length){showToast('Completa al menos una prenda con tipo, talla y cantidad','err');return;}
+  const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Guardando…';
+  const notes=document.getElementById('notes').value.trim();
+  const sesion='P-'+new Date().toISOString().replace(/[-:T.Z]/g,'').slice(0,14);
+  const rows=valid.map(it=>({sesion_id:sesion,accion:it.accion,tipo:it.tipo,talla:it.talla,cantidad:parseInt(it.cantidad),notas:notes,registrado_por:currentUser?currentUser.email:''}));
+  const {error}=await sb.from('movimientos').insert(rows);
+  btn.disabled=false;btn.textContent='✓ Guardar registro';
+  if(error){showToast('Error al guardar: '+error.message,'err');console.error(error);return;}
+  items=[{accion:'DONATION_IN',tipo:'',talla:'',cantidad:''}];
+  document.getElementById('notes').value='';
+  renderItems();
+  showToast(`✓ ${valid.length} movimiento${valid.length>1?'s':''} guardado${valid.length>1?'s':''}`, 'ok');
+  /* realtime will refresh, but refresh now too for instant feedback */
+  loadFromCloud();
+}
+
+/* ── Inventario ── */
+function setInvF(f,el){invF=f;document.querySelectorAll('.fltbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderInventory();}
+function renderInventory(){
+  const q=(document.getElementById('inv-search')||{}).value||'';
+  let entries=getInv();
+  const ok=entries.filter(e=>e.stock>3).length;
+  const low=entries.filter(e=>e.stock>0&&e.stock<=3).length;
+  const zero=entries.filter(e=>e.d>0&&e.stock<=0).length;
+  document.getElementById('inv-ok').textContent=ok;
+  document.getElementById('inv-low').textContent=low;
+  document.getElementById('inv-zero').textContent=zero;
+  document.getElementById('inv-sku-count').textContent=(ok+low)+' SKUs con stock';
+  if(invF==='ok')entries=entries.filter(e=>e.stock>3);
+  else if(invF==='low')entries=entries.filter(e=>e.stock>0&&e.stock<=3);
+  else if(invF==='zero')entries=entries.filter(e=>e.d>0&&e.stock<=0);
+  else entries=entries.filter(e=>e.d>0||e.stock!==0);
+  if(q)entries=entries.filter(e=>(e.tipo+e.talla).toLowerCase().includes(q.toLowerCase()));
+  entries.sort((a,b)=>a.tipo.localeCompare(b.tipo)||a.talla.localeCompare(b.talla,undefined,{numeric:true}));
+  const wrap=document.getElementById('inv-table-wrap');
+  if(!entries.length){wrap.innerHTML='<div class="empty"><div class="ei">🔍</div><p>Sin resultados</p></div>';return;}
+  const mx=Math.max(...entries.map(e=>e.d),1);
+  wrap.innerHTML=`<table class="itbl"><thead><tr><th>Tipo</th><th>Talla</th><th style="color:var(--green)">+Dona</th><th>−Reusa</th><th>−Trans</th><th>−Recicl</th><th>Stock</th></tr></thead><tbody>
+  ${entries.map(e=>{const st=e.stock;const cc=st<=0?'sn-zero':st<=3?'sn-low':'sn-ok';const fc=st<=0?'f-zero':st<=3?'f-low':'f-ok';const pct=Math.min(100,Math.round((Math.max(0,st)/mx)*100));
+    return`<tr class="${st<=0&&e.d>0?'nr':''}"><td>${base(e.tipo)}${tag(e.tipo)}</td><td><strong>${e.talla}</strong></td><td class="np">${e.d}</td><td class="nm">${e.t}</td><td class="nm">${e.tr}</td><td class="nm">${e.r}</td>
+    <td><div class="sbw"><div class="sb-bar"><div class="sbf ${fc}" style="width:${pct}%"></div></div><span class="sn ${cc}">${st}</span></div></td></tr>`;}).join('')}</tbody></table>`;
+}
+
+/* ── Historial ── */
+function setHF(f,el){histF=f;document.querySelectorAll('.hfbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderHistory();}
+function renderHistory(){
+  const list=document.getElementById('history-list');
+  let filtered=histF==='all'?txs:txs.filter(x=>x.accion===histF);
+  document.getElementById('hist-count').textContent=filtered.length+' movimiento'+(filtered.length!==1?'s':'');
+  if(!filtered.length){list.innerHTML=`<div class="hempty">Sin movimientos${histF!=='all'?' con este filtro':''}</div>`;return;}
+  const byDay={};
+  [...filtered].reverse().forEach(x=>{
+    const d=new Date(x.ts);const today=new Date();const yest=new Date(today);yest.setDate(today.getDate()-1);
+    let dk;
+    if(d.toDateString()===today.toDateString())dk='Hoy';
+    else if(d.toDateString()===yest.toDateString())dk='Ayer';
+    else dk=d.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+    if(!byDay[dk])byDay[dk]=[];byDay[dk].push(x);
+  });
+  list.innerHTML=Object.entries(byDay).map(([day,rows])=>{
+    const byPid={};rows.forEach(x=>{if(!byPid[x.pid])byPid[x.pid]=[];byPid[x.pid].push(x);});
+    const sessHtml=Object.entries(byPid).map(([pid,srows])=>{
+      const time=new Date(srows[0].ts).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+      const who=srows[0].por?' · '+srows[0].por.split('@')[0]:'';
+      const sum={};srows.forEach(x=>sum[x.accion]=(sum[x.accion]||0)+parseInt(x.cantidad));
+      const pillsHtml=Object.entries(sum).map(([c,v])=>{const a=byC(c);
+        const bg=c==='DONATION_IN'?'var(--green-light)':c==='TAKE_OUT'?'var(--blue-light)':c==='TRANSFER_OUT'?'var(--amber-light)':'var(--purple-light)';
+        const col=c==='DONATION_IN'?'var(--green-dark)':c==='TAKE_OUT'?'#0C447C':c==='TRANSFER_OUT'?'var(--amber)':'var(--purple)';
+        return`<span class="spill" style="background:${bg};color:${col}">${a.short} ×${v}</span>`;}).join('');
+      const rowsHtml=srows.map(x=>{const ax=byC(x.accion);const sign=ax.sign===1?'+':'−';const qc=ax.sign===1?'hqp':'hqm';
+        return`<div class="hr"><span class="hb ${ax.hb}">${ax.short}</span><div><div class="hn">${base(x.tipo)}${tag(x.tipo)}</div><div class="hs">Talla <strong>${x.talla}</strong>${x.notas?' · '+x.notas:''}</div></div><div class="hq ${qc}">${sign}${x.cantidad}</div></div>`;}).join('');
+      return`<div class="sblk"><div class="shd"><span class="sid">${pid}${who}</span><div style="display:flex;align-items:center;gap:8px"><div class="spills">${pillsHtml}</div><span class="stm">${time}</span></div></div>${rowsHtml}</div>`;
+    }).join('');
+    return`<div class="dg"><div class="dlbl">${day}</div>${sessHtml}</div>`;
+  }).join('');
+}
+
+function showTab(n){
+  ['registro','inventario','historial'].forEach(t=>{document.getElementById('tab-'+t).classList.toggle('on',t===n);});
+  document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('on',['registro','inventario','historial'][i]===n));
+  if(n==='inventario')renderInventory();
+  if(n==='historial')renderHistory();
+}
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+/* Enter key submits login */
+document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+initApp();
+</script>
+</body>
+</html>
