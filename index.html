@@ -511,13 +511,13 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Live "gviz" endpoint — reads the sheet directly (no 5-min publish cache), wrapped in a CORS proxy for the browser.
-const CSV_URL = "https://corsproxy.io/?url=" + encodeURIComponent(
-  "https://docs.google.com/spreadsheets/d/1tzWm-bLqIZKHxMF6pgcpankSBhZBqIO10RtaGyfiV1o/gviz/tq?tqx=out:csv&sheet=INVENTORY_CURRENT"
+const sb = supabase.createClient(
+  'https://rwtscnlmuhegodxizplf.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3dHNjbmxtdWhlZ29keGl6cGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0Mjk4NzMsImV4cCI6MjA5OTAwNTg3M30.7A-dzZce2rRo2xqCkn5lgtTqidL71KLFH9JANHLns9g'
 );
 const IMG_DIR = "imágenes/";
-const REFRESH_MS = 30 * 1000;
 const LOW_STOCK = 2; // total <= LOW_STOCK -> "Últimas piezas"
 
 const TAG_ICON = '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
@@ -556,27 +556,7 @@ let ITEMS = [];
 let activeFilter = "todos";
 let currentSize = "";   // "" = todas
 
-/* ---------- CSV ---------- */
-function parseCSV(text){
-  const rows = [];
-  let row = [], field = "", inQ = false;
-  for(let i=0;i<text.length;i++){
-    const c = text[i];
-    if(inQ){
-      if(c === '"'){ if(text[i+1] === '"'){ field += '"'; i++; } else inQ = false; }
-      else field += c;
-    } else {
-      if(c === '"') inQ = true;
-      else if(c === ','){ row.push(field); field = ""; }
-      else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ""; }
-      else if(c === '\r'){ /* skip */ }
-      else field += c;
-    }
-  }
-  if(field.length || row.length){ row.push(field); rows.push(row); }
-  return rows;
-}
-
+/* ---------- Rows ---------- */
 function buildItems(rows){
   if(!rows.length) return [];
   const header = rows[0].map(h => h.trim().toLowerCase());
@@ -723,10 +703,11 @@ function updateStats(){
 /* ---------- Data ---------- */
 async function load(){
   try{
-    const res = await fetch(CSV_URL, { cache:"no-store" });
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    const text = await res.text();
-    ITEMS = buildItems(parseCSV(text));
+    const { data, error } = await sb.from("inventario_actual").select("*");
+    if(error) throw error;
+    const rows = [["tipo","talla","stock final"]];
+    (data || []).forEach(r => rows.push([r.tipo, r.talla, String(r.stock)]));
+    ITEMS = buildItems(rows);
     populateSizes();
     updateStats();
     render();
@@ -770,7 +751,9 @@ document.getElementById("filters").addEventListener("click", e => {
 });
 
 load();
-setInterval(load, REFRESH_MS);
+sb.channel("catalogo-live")
+  .on("postgres_changes", { event: "*", schema: "public", table: "movimientos" }, () => load())
+  .subscribe();
 </script>
 </body>
 </html>
