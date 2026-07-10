@@ -62,17 +62,24 @@ body{font-family:var(--font);background:var(--g1);color:var(--g7);font-size:14px
 .item-block{border:1px solid var(--g3);border-radius:var(--radius);padding:1rem;margin-bottom:10px;background:var(--g1);}
 .item-block.bd-dona{border-left:3px solid var(--green);}.item-block.bd-toma{border-left:3px solid var(--blue);}
 .item-block.bd-trans{border-left:3px solid #B8860B;}.item-block.bd-reci{border-left:3px solid var(--purple);}
+.item-block.bd-ajus{border-left:3px solid var(--g5);}
 .itop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .ilbl{font-size:12px;font-weight:600;color:var(--g5);}
 .rmbtn{width:24px;height:24px;border-radius:50%;background:none;border:1px solid var(--g3);color:var(--g5);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1;}
 .rmbtn:hover{background:var(--red-light);border-color:var(--red);color:var(--red);}
-.apills{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
+.apills{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px;}
 .apill{padding:7px 4px;border:1px solid var(--g3);border-radius:var(--radius);background:var(--g0);font-size:11px;cursor:pointer;text-align:center;color:var(--g5);font-family:var(--font);font-weight:500;transition:all .1s;line-height:1.4;}
 .apill:hover{border-color:var(--g4);color:var(--g7);}
 .p-dona{background:var(--green-light)!important;border-color:var(--green-mid)!important;color:var(--green-dark)!important;}
 .p-toma{background:var(--blue-light)!important;border-color:var(--blue)!important;color:#0C447C!important;}
 .p-trans{background:var(--amber-light)!important;border-color:#B8860B!important;color:var(--amber)!important;}
 .p-reci{background:var(--purple-light)!important;border-color:#534AB7!important;color:var(--purple)!important;}
+.p-ajus{background:var(--g2)!important;border-color:var(--g5)!important;color:var(--g6)!important;}
+.signrow{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.signbtn{padding:8px;border:1px solid var(--g3);border-radius:var(--radius);background:var(--g0);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--g5);}
+.signbtn:hover{border-color:var(--g4);}
+.signbtn.plus.on{background:var(--green-light);border-color:var(--green-mid);color:var(--green-dark);}
+.signbtn.minus.on{background:var(--red-light);border-color:var(--red);color:var(--red);}
 .frow{display:grid;grid-template-columns:2fr 1fr .9fr;gap:8px;}
 .fl label{display:block;font-size:11px;font-weight:600;color:var(--g5);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
 select,input[type="number"],textarea{width:100%;padding:8px 10px;border:1px solid var(--g3);border-radius:var(--radius);background:var(--g0);color:var(--g7);font-size:13px;font-family:var(--font);}
@@ -130,6 +137,7 @@ textarea{resize:vertical;min-height:60px;}
 .hb-t{background:var(--blue-light);color:#0C447C;}
 .hb-tr{background:var(--amber-light);color:var(--amber);}
 .hb-r{background:var(--purple-light);color:var(--purple);}
+.hb-ajus{background:var(--g2);color:var(--g6);}
 .hn{font-size:12px;font-weight:500;}.hs{font-size:11px;color:var(--g5);margin-top:1px;}
 .hq{font-size:15px;font-weight:700;text-align:right;}
 .hqp{color:var(--green);}.hqm{color:var(--red);}
@@ -209,6 +217,7 @@ textarea{resize:vertical;min-height:60px;}
           <div class="li"><div class="ld" style="background:var(--blue)"></div>Reusando <strong>resta</strong></div>
           <div class="li"><div class="ld" style="background:#B8860B"></div>Transfiriendo <strong>resta</strong></div>
           <div class="li"><div class="ld" style="background:var(--purple)"></div>Reciclado <strong>resta</strong></div>
+          <div class="li"><div class="ld" style="background:var(--g5)"></div>Ajuste <strong>corrige +/−</strong></div>
         </div>
         <div id="items-container"></div>
         <button class="addbtn" onclick="addItem()" id="add-btn">＋ Agregar otra prenda (máx. 10)</button>
@@ -272,12 +281,18 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 /* ═══════════════════════════════════════════════════════════ */
 
 const TYPES=['BATA/LABORATORIO-SEC/PREP','CHALECO-TODOS','CHAMARRA/DEPORTIVA-TODOS','CHAMARRA/INVIERNO-TODOS','HOODIE-SEC/PREP','JUMPER-PRI','PANTALON/DEPORTIVO-TODOS','PANTALON/VESTIR-PRI','PLAYERA-SEC/PREP','PLAYERAV-SEC/PREP','PLAYERA/POLO','POLO/LARGA-TODOS','SHORT-TODOS','SUETER/ABIERTO-PRI','SUETER/CERRADO-PRI','SUETER/DEPORTIVO-SEC/PREP'];
-const SIZES=['0','2','4','6','8','10','12','14','16','18','20','28','30','32','34','36','38','40','CH','M','G','XG'];
+const SIZES=['0','2','4','6','8','10','12','14','16','18','20','28','30','32','34','36','38','40','CH','M','G','XG','Z'];
 const ACTS=[
   {code:'DONATION_IN', label:'Donando al programa',      short:'Donando',       sign:1,  psel:'p-dona', bd:'bd-dona', hb:'hb-d'},
   {code:'TAKE_OUT',    label:'Reusando',                  short:'Reusando',      sign:-1, psel:'p-toma', bd:'bd-toma', hb:'hb-t'},
   {code:'TRANSFER_OUT',label:'Transfiriendo a otra org.', short:'Transfiriendo', sign:-1, psel:'p-trans',bd:'bd-trans',hb:'hb-tr'},
   {code:'RECYCLE_OUT', label:'Reciclado',                 short:'Reciclado',     sign:-1, psel:'p-reci', bd:'bd-reci', hb:'hb-r'},
+];
+const ADJ_CATS=[
+  {code:'DONATION_IN', label:'Donadas'},
+  {code:'TAKE_OUT',    label:'Reusadas'},
+  {code:'TRANSFER_OUT',label:'Transferidas'},
+  {code:'RECYCLE_OUT', label:'Recicladas'},
 ];
 
 let sb=null, currentUser=null;
@@ -286,6 +301,14 @@ let items=[], txs=[], invF='all', histF='all';
 function byC(c){return ACTS.find(a=>a.code===c)||ACTS[0];}
 function tag(tipo){if(tipo.includes('SEC/PREP'))return'<span class="ttag tag-s">SEC/PREP</span>';if(tipo.includes('PRI'))return'<span class="ttag tag-p">PRI</span>';return'<span class="ttag tag-a">TODOS</span>';}
 function base(tipo){return tipo.replace(/-SEC\/PREP|-PRI|-TODOS/g,'');}
+/* Adjustments are tagged inside the "notas" column (e.g. "[AJUSTE+] motivo") instead of a new DB column,
+   so cantidad in the DB always stays a positive magnitude and the sign lives client-side. */
+function parseAdj(notas){
+  if(!notas) return null;
+  const m=/^\[AJUSTE([+-])\]\s?/.exec(notas);
+  if(!m) return null;
+  return {sign:m[1]==='+'?1:-1, reason:notas.slice(m[0].length)};
+}
 
 /* ── Init: check config & session ── */
 function initApp(){
@@ -360,9 +383,9 @@ function setSync(state,text){
 /* ── Stats ── */
 function getStats(){
   let d=0,t=0,tr=0,r=0,pids=new Set();
-  txs.forEach(x=>{const q=parseInt(x.cantidad)||0;pids.add(x.pid);
-    if(x.accion==='DONATION_IN')d+=q;else if(x.accion==='TAKE_OUT')t+=q;
-    else if(x.accion==='TRANSFER_OUT')tr+=q;else if(x.accion==='RECYCLE_OUT')r+=q;});
+  txs.forEach(x=>{const q=parseInt(x.cantidad)||0;const adj=parseAdj(x.notas);const sq=adj?adj.sign*q:q;pids.add(x.pid);
+    if(x.accion==='DONATION_IN')d+=sq;else if(x.accion==='TAKE_OUT')t+=sq;
+    else if(x.accion==='TRANSFER_OUT')tr+=sq;else if(x.accion==='RECYCLE_OUT')r+=sq;});
   return{d,t,tr,r,s:d-t-tr-r,p:pids.size};
 }
 function updateStats(){const s=getStats();document.getElementById('s-d').textContent=s.d;document.getElementById('s-t').textContent=s.t;document.getElementById('s-tr').textContent=s.tr;document.getElementById('s-r').textContent=s.r;document.getElementById('s-s').textContent=s.s;document.getElementById('s-p').textContent=s.p;}
@@ -370,9 +393,9 @@ function getInv(){
   const inv={};
   txs.forEach(x=>{const k=x.tipo+'||'+x.talla;
     if(!inv[k])inv[k]={tipo:x.tipo,talla:x.talla,d:0,t:0,tr:0,r:0};
-    const q=parseInt(x.cantidad)||0;
-    if(x.accion==='DONATION_IN')inv[k].d+=q;else if(x.accion==='TAKE_OUT')inv[k].t+=q;
-    else if(x.accion==='TRANSFER_OUT')inv[k].tr+=q;else if(x.accion==='RECYCLE_OUT')inv[k].r+=q;});
+    const q=parseInt(x.cantidad)||0;const adj=parseAdj(x.notas);const sq=adj?adj.sign*q:q;
+    if(x.accion==='DONATION_IN')inv[k].d+=sq;else if(x.accion==='TAKE_OUT')inv[k].t+=sq;
+    else if(x.accion==='TRANSFER_OUT')inv[k].tr+=sq;else if(x.accion==='RECYCLE_OUT')inv[k].r+=sq;});
   return Object.values(inv).map(e=>({...e,stock:e.d-e.t-e.tr-e.r}));
 }
 
@@ -380,32 +403,63 @@ function getInv(){
 function renderItems(){
   const c=document.getElementById('items-container');c.innerHTML='';
   items.forEach((item,i)=>{
-    const a=byC(item.accion);const div=document.createElement('div');
+    const isAdj=item.accion==='ADJUSTMENT';
+    const a=isAdj?{bd:'bd-ajus'}:byC(item.accion);
+    const div=document.createElement('div');
     div.className='item-block '+a.bd;
-    div.innerHTML=`<div class="itop"><span class="ilbl">Prenda #${i+1}${i===0?' — obligatoria':' — opcional'}</span>${i>0?`<button class="rmbtn" onclick="removeItem(${i})">&times;</button>`:''}</div>
-    <div class="apills">${ACTS.map(ax=>`<button class="apill ${item.accion===ax.code?ax.psel:''}" onclick="setAct(${i},'${ax.code}')">${ax.label}</button>`).join('')}</div>
+    const body=isAdj?`
+    <div class="fl" style="margin-bottom:10px"><label>Categoría a corregir</label><select onchange="upd(${i},'ajusteCat',this.value)"><option value="">Selecciona…</option>${ADJ_CATS.map(cAdj=>`<option value="${cAdj.code}"${item.ajusteCat===cAdj.code?' selected':''}>${cAdj.label}</option>`).join('')}</select></div>
+    <div class="signrow">
+      <button type="button" class="signbtn plus ${item.ajusteSigno==='+'?'on':''}" onclick="setAdjSign(${i},'+')">➕ Aumentar</button>
+      <button type="button" class="signbtn minus ${item.ajusteSigno==='-'?'on':''}" onclick="setAdjSign(${i},'-')">➖ Disminuir</button>
+    </div>
     <div class="frow">
       <div class="fl"><label>Tipo de prenda</label><select onchange="upd(${i},'tipo',this.value)"><option value="">Selecciona…</option>${TYPES.map(t=>`<option value="${t}"${item.tipo===t?' selected':''}>${t}</option>`).join('')}</select></div>
       <div class="fl"><label>Talla</label><select onchange="upd(${i},'talla',this.value)"><option value="">Talla…</option>${SIZES.map(s=>`<option value="${s}"${item.talla===s?' selected':''}>${s}</option>`).join('')}</select></div>
       <div class="fl"><label>Cantidad</label><input type="number" min="1" max="100" value="${item.cantidad||''}" placeholder="0" onchange="upd(${i},'cantidad',this.value)"></div>
-    </div>`;
+    </div>
+    <div class="fl" style="margin-top:10px"><label>Motivo del ajuste (obligatorio)</label><textarea placeholder="Explica el error que se está corrigiendo…" onchange="upd(${i},'motivo',this.value)">${item.motivo||''}</textarea></div>
+    `:`
+    <div class="frow">
+      <div class="fl"><label>Tipo de prenda</label><select onchange="upd(${i},'tipo',this.value)"><option value="">Selecciona…</option>${TYPES.map(t=>`<option value="${t}"${item.tipo===t?' selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="fl"><label>Talla</label><select onchange="upd(${i},'talla',this.value)"><option value="">Talla…</option>${SIZES.map(s=>`<option value="${s}"${item.talla===s?' selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="fl"><label>Cantidad</label><input type="number" min="1" max="100" value="${item.cantidad||''}" placeholder="0" onchange="upd(${i},'cantidad',this.value)"></div>
+    </div>
+    `;
+    div.innerHTML=`<div class="itop"><span class="ilbl">Prenda #${i+1}${i===0?' — obligatoria':' — opcional'}</span>${i>0?`<button class="rmbtn" onclick="removeItem(${i})">&times;</button>`:''}</div>
+    <div class="apills">${ACTS.map(ax=>`<button class="apill ${item.accion===ax.code?ax.psel:''}" onclick="setAct(${i},'${ax.code}')">${ax.label}</button>`).join('')}<button class="apill ${isAdj?'p-ajus':''}" onclick="setAct(${i},'ADJUSTMENT')">⚖️ Ajuste (+/−)</button></div>
+    ${body}`;
     c.appendChild(div);
   });
   document.getElementById('item-count').textContent=items.length+(items.length===1?' prenda':' prendas');
   document.getElementById('add-btn').style.display=items.length>=10?'none':'flex';
 }
-function setAct(i,c){items[i].accion=c;renderItems();}
+function setAct(i,c){items[i].accion=c;if(c==='ADJUSTMENT'&&!items[i].ajusteSigno)items[i].ajusteSigno='+';renderItems();}
+function setAdjSign(i,s){items[i].ajusteSigno=s;renderItems();}
 function upd(i,f,v){items[i][f]=v;}
 function removeItem(i){items.splice(i,1);renderItems();}
 function addItem(){if(items.length<10){items.push({accion:'DONATION_IN',tipo:'',talla:'',cantidad:''});renderItems();}}
 
+function isItemValid(it){
+  if(it.accion==='ADJUSTMENT'){
+    return !!(it.ajusteCat&&it.ajusteSigno&&it.tipo&&it.talla&&it.cantidad&&parseInt(it.cantidad)>0&&it.motivo&&it.motivo.trim());
+  }
+  return !!(it.tipo&&it.talla&&it.cantidad&&parseInt(it.cantidad)>0);
+}
+
 async function submitForm(){
-  const valid=items.filter(it=>it.tipo&&it.talla&&it.cantidad&&parseInt(it.cantidad)>0);
-  if(!valid.length){showToast('Completa al menos una prenda con tipo, talla y cantidad','err');return;}
+  const valid=items.filter(isItemValid);
+  if(!valid.length){showToast('Completa al menos una prenda con tipo, talla y cantidad (los ajustes también requieren categoría y motivo)','err');return;}
   const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Guardando…';
   const notes=document.getElementById('notes').value.trim();
   const sesion='P-'+new Date().toISOString().replace(/[-:T.Z]/g,'').slice(0,14);
-  const rows=valid.map(it=>({sesion_id:sesion,accion:it.accion,tipo:it.tipo,talla:it.talla,cantidad:parseInt(it.cantidad),notas:notes,registrado_por:currentUser?currentUser.email:''}));
+  const rows=valid.map(it=>{
+    if(it.accion==='ADJUSTMENT'){
+      const notaTxt=`[AJUSTE${it.ajusteSigno}] ${it.motivo.trim()}`+(notes?` · ${notes}`:'');
+      return {sesion_id:sesion,accion:it.ajusteCat,tipo:it.tipo,talla:it.talla,cantidad:parseInt(it.cantidad),notas:notaTxt,registrado_por:currentUser?currentUser.email:''};
+    }
+    return {sesion_id:sesion,accion:it.accion,tipo:it.tipo,talla:it.talla,cantidad:parseInt(it.cantidad),notas:notes,registrado_por:currentUser?currentUser.email:''};
+  });
   const {error}=await sb.from('movimientos').insert(rows);
   btn.disabled=false;btn.textContent='✓ Guardar registro';
   if(error){showToast('Error al guardar: '+error.message,'err');console.error(error);return;}
@@ -465,13 +519,19 @@ function renderHistory(){
     const sessHtml=Object.entries(byPid).map(([pid,srows])=>{
       const time=new Date(srows[0].ts).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
       const who=srows[0].por?' · '+srows[0].por.split('@')[0]:'';
-      const sum={};srows.forEach(x=>sum[x.accion]=(sum[x.accion]||0)+parseInt(x.cantidad));
-      const pillsHtml=Object.entries(sum).map(([c,v])=>{const a=byC(c);
+      const sum={};srows.forEach(x=>{const adj=parseAdj(x.notas);const q=parseInt(x.cantidad)||0;const key=x.accion+(adj?'|ADJ':'');
+        if(!sum[key])sum[key]={accion:x.accion,isAdj:!!adj,v:0};sum[key].v+=adj?adj.sign*q:q;});
+      const pillsHtml=Object.values(sum).map(s=>{const a=byC(s.accion);
+        if(s.isAdj){const sg=s.v>=0?'+':'−';return`<span class="spill" style="background:var(--g2);color:var(--g6)">⚖ Ajuste ${a.short} ${sg}${Math.abs(s.v)}</span>`;}
+        const c=s.accion;
         const bg=c==='DONATION_IN'?'var(--green-light)':c==='TAKE_OUT'?'var(--blue-light)':c==='TRANSFER_OUT'?'var(--amber-light)':'var(--purple-light)';
         const col=c==='DONATION_IN'?'var(--green-dark)':c==='TAKE_OUT'?'#0C447C':c==='TRANSFER_OUT'?'var(--amber)':'var(--purple)';
-        return`<span class="spill" style="background:${bg};color:${col}">${a.short} ×${v}</span>`;}).join('');
-      const rowsHtml=srows.map(x=>{const ax=byC(x.accion);const sign=ax.sign===1?'+':'−';const qc=ax.sign===1?'hqp':'hqm';
-        return`<div class="hr"><span class="hb ${ax.hb}">${ax.short}</span><div><div class="hn">${base(x.tipo)}${tag(x.tipo)}</div><div class="hs">Talla <strong>${x.talla}</strong>${x.notas?' · '+x.notas:''}</div></div><div class="hq ${qc}">${sign}${x.cantidad}</div></div>`;}).join('');
+        return`<span class="spill" style="background:${bg};color:${col}">${a.short} ×${s.v}</span>`;}).join('');
+      const rowsHtml=srows.map(x=>{const ax=byC(x.accion);const adj=parseAdj(x.notas);
+        const s=adj?adj.sign:ax.sign;const sign=s===1?'+':'−';const qc=s===1?'hqp':'hqm';
+        const badgeClass=adj?'hb-ajus':ax.hb;const badgeText=adj?'⚖ Ajuste':ax.short;
+        const noteText=adj?adj.reason:x.notas;
+        return`<div class="hr"><span class="hb ${badgeClass}">${badgeText}</span><div><div class="hn">${base(x.tipo)}${tag(x.tipo)}${adj?` <span class="ttag tag-a">${ax.short}</span>`:''}</div><div class="hs">Talla <strong>${x.talla}</strong>${noteText?' · '+noteText:''}</div></div><div class="hq ${qc}">${sign}${x.cantidad}</div></div>`;}).join('');
       return`<div class="sblk"><div class="shd"><span class="sid">${pid}${who}</span><div style="display:flex;align-items:center;gap:8px"><div class="spills">${pillsHtml}</div><span class="stm">${time}</span></div></div>${rowsHtml}</div>`;
     }).join('');
     return`<div class="dg"><div class="dlbl">${day}</div>${sessHtml}</div>`;

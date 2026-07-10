@@ -550,7 +550,7 @@ const FILTERS = [
   { key:"sec",     label:"Sec/Prepa" }
 ];
 
-const SIZE_ORDER = ["CH","M","G","XG"];
+const SIZE_ORDER = ["CH","M","G","XG","Z"];
 const NO_SIZE = "Única"; // label for stock rows with no size recorded
 let ITEMS = [];
 let activeFilter = "todos";
@@ -704,6 +704,8 @@ function updateStats(){
 async function load(){
   try{
     const { data, error } = await sb.from("inventario_actual").select("*");
+    console.log("DEBUG data:", data);
+    console.log("DEBUG error:", error);
     if(error) throw error;
     const rows = [["tipo","talla","stock final"]];
     (data || []).forEach(r => rows.push([r.tipo, r.talla, String(r.stock)]));
